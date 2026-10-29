@@ -41,7 +41,7 @@ jobs:
 
       - name: Run dbt Compile Check
         env:
-          DBT_PROFILES_DIR: ./transform_engine
+          DBT_PROFILES_DIR: .
         run: |
           cd transform_engine
           uv run dbt parse
