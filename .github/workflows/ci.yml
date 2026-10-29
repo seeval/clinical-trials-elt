@@ -1,4 +1,4 @@
-name: ELT Pipeline CI/CD
+name: CI Code Quality Check
 
 on:
   push:
@@ -7,24 +7,8 @@ on:
     branches: [ main ]
 
 jobs:
-  validate-and-test:
+  dbt-compile-check:
     runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: postgres:15-alpine
-        env:
-          POSTGRES_DB: clinical_dw
-          POSTGRES_USER: analytics_user
-          POSTGRES_PASSWORD: analytics_password
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -34,14 +18,26 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install uv & Dependencies
+      - name: Install uv & dependencies
         run: |
           pip install uv
           uv sync
+      
+      - name: Create Dummy dbt profiles.yml for CI Parse Check
+        run: |
+          mkdir -p transform_engine/.dbt
+          cat << EOF > transform_engine/profiles.yml
+          clinical_trials_transform:
+            target: dev
+            outputs: 
+              dev: 
+                type: duckdb
+                path: output/test_dw.duckdb
+          EOF
 
-      - name: Run dbt Compile Check
+      - name: Run dbt Parse Check
         env:
-          DBT_PROFILES_DIR: .
+            DBT_PROFILES_DIR: ./transform_engine
         run: |
           cd transform_engine
           uv run dbt parse
