@@ -17,13 +17,23 @@ final as (
         brief_title,
         overall_status,
         study_type,
+        
+        -- Eligibility dimensions
+        minimum_age,
+        maximum_age,
+        sex,
+        case 
+            when healthy_volunteers = 'true' then true 
+            else false 
+        end as accepts_healthy_volunteers,
+
         last_update_date,
         ingested_at,
-        
-        -- Analytical flags or metrics
-        case 
-            when overall_status = 'COMPLETED' then true 
-            else false 
+
+        -- Analytical flags
+        case
+            when overall_status = 'COMPLETED' then true
+            else false
         end as is_completed
 
     from intermediate
