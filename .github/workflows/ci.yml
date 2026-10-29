@@ -25,19 +25,16 @@ jobs:
       
       - name: Create Dummy dbt profiles.yml for CI Parse Check
         run: |
-          mkdir -p transform_engine/.dbt
+          mkdir -p transform_engine
           cat << EOF > transform_engine/profiles.yml
           clinical_trials_transform:
             target: dev
-            outputs: 
-              dev: 
+            outputs:
+              dev:
                 type: duckdb
                 path: output/test_dw.duckdb
           EOF
 
       - name: Run dbt Parse Check
-        env:
-            DBT_PROFILES_DIR: ./transform_engine
         run: |
-          cd transform_engine
-          uv run dbt parse
+          uv run dbt parse --project-dir transform_engine --profiles-dir transform_engine
