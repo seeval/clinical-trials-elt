@@ -3,18 +3,49 @@ services:
     image: postgres:16-alpine
     container_name: clinical_postgres_dw
     environment:
-    - POSTGRES_DB=clinical_dw
-    - POSTGRES_USER=analytics_user
-    - POSTGRES_PASSWORD=analytics_password
+      - POSTGRES_DB=clinical_dw
+      - POSTGRES_USER=analytics_user
+      - POSTGRES_PASSWORD=analytics_password
     ports:
-    - "5432:5432"
+      - "5432:5432"
     volumes:
-    - pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U analytics_user -d clinical_dw"]
       interval: 5s
       timeout: 5s
       retries: 5
 
+  dagster_webserver:
+    build: .
+    container_name: clinical_dagster_webserver
+    entrypoint: ["dagster-webserver", "-h", "0.0.0.0", "-p", "3000", "-m", "orchestration"]
+    environment:
+      - DAGSTER_HOME=/opt/dagster/dagster_home
+      - DB_HOST=postgres
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - dagster_home:/opt/dagster/dagster_home
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  dagster_daemon:
+    build: .
+    container_name: clinical_dagster_daemon
+    entrypoint: ["dagster-daemon", "run"]
+    environment:
+      - DAGSTER_HOME=/opt/dagster/dagster_home
+      - DB_HOST=postgres
+    volumes:
+      - .:/app
+      - dagster_home:/opt/dagster/dagster_home
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 volumes:
   pgdata:
+  dagster_home:
