@@ -1,0 +1,18 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+.tmp_dagster_home_*
+transform_engine/output/*.duckdb
+transform_engine/target/
+transform_engine/logs/
+logs/
+.DS_Store
+.env

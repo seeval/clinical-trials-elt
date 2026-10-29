@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: raw_clinical
+    description: Operational landing layer in PostgreSQL containing raw JSON study payloads.
+    database: postgres_db
+    schema: raw_clinical
+    tables:
+      - name: studies
+        description: Raw ClinicalTrials.gov study records.
+        columns:
+          - name: nct_id
+            tests:
+              - unique
+              - not_null
+          - name: payload_hash
+            tests:
+              - not_null

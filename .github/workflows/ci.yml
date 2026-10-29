@@ -1,0 +1,47 @@
+name: ELT Pipeline CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: clinical_dw
+          POSTGRES_USER: analytics_user
+          POSTGRES_PASSWORD: analytics_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install uv & Dependencies
+        run: |
+          pip install uv
+          uv sync
+
+      - name: Run dbt Compile Check
+        env:
+          DBT_PROFILES_DIR: ./transform_engine
+        run: |
+          cd transform_engine
+          uv run dbt parse
