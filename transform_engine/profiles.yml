@@ -1,0 +1,12 @@
+clinical_trials_transform:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: /app/transform_engine/output/clinical_dw.duckdb
+      extensions:
+        - postgres
+      attach:
+        - path: 'dbname=clinical_dw user=analytics_user password=analytics_password host={{ env_var("DB_HOST", "localhost") }} port=5432'
+          alias: postgres_db
+          type: postgres

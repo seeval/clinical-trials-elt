@@ -19,7 +19,7 @@ services:
   dagster_webserver:
     build: .
     container_name: clinical_dagster_webserver
-    entrypoint: ["dagster-webserver", "-h", "0.0.0.0", "-p", "3000", "-m", "orchestration"]
+    entrypoint: ["dagster-webserver", "-h", "0.0.0.0", "-p", "3000"]
     environment:
       - DAGSTER_HOME=/opt/dagster/dagster_home
       - DB_HOST=postgres

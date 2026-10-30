@@ -16,3 +16,4 @@ transform_engine/logs/
 logs/
 .DS_Store
 .env
+transform_engine/.user.yml
